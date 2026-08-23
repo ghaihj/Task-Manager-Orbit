@@ -8,8 +8,18 @@ use App\Http\Services\ProjectService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Class ProjectController
+ *
+ * Handles incoming API requests for project management endpoints.
+ */
 class ProjectController extends Controller
 {
+    /**
+     * ProjectController constructor.
+     *
+     * @param ProjectService $projectService Service layer handling project operations.
+     */
     public function __construct(private ProjectService $projectService)
     {
     }
@@ -21,6 +31,12 @@ class ProjectController extends Controller
     //     return response()->json($projects);
     // }
 
+    /**
+     * Store a newly created project in storage.
+     *
+     * @param CreateProjectRequest $request Validated request containing project attributes.
+     * @return JsonResponse JSON payload containing the created project data and a 201 status code.
+     */
     public function store(CreateProjectRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -34,6 +50,12 @@ class ProjectController extends Controller
         ], 201);
     }
 
+    /**
+     * Display the specified project details.
+     *
+     * @param int $projectId Unique identifier of the project.
+     * @return JsonResponse JSON payload containing project details and relations.
+     */
     public function show(int $projectId): JsonResponse
     {
         $project = $this->projectService->getProjectById($projectId);
@@ -41,6 +63,13 @@ class ProjectController extends Controller
         return response()->json($project);
     }
 
+    /**
+     * Update the specified project in storage.
+     *
+     * @param UpdateProjectRequest $request Validated request containing updatable project fields.
+     * @param int $projectId Unique identifier of the project to update.
+     * @return JsonResponse JSON payload containing success message and updated project model.
+     */
     public function update(UpdateProjectRequest $request, int $projectId): JsonResponse
     {
         $project = $this->projectService->updateProject($projectId, $request->validated());
@@ -51,6 +80,12 @@ class ProjectController extends Controller
         ]);
     }
 
+    /**
+     * Remove the specified project from storage.
+     *
+     * @param int $projectId Unique identifier of the project to delete.
+     * @return JsonResponse JSON payload with a success message.
+     */
     public function destroy(int $projectId): JsonResponse
     {
         $this->projectService->deleteProject($projectId);
@@ -60,6 +95,13 @@ class ProjectController extends Controller
         ]);
     }
 
+    /**
+     * Change the current status of a specific project.
+     *
+     * @param Request $request Request containing the new status value.
+     * @param int $projectId Unique identifier of the project.
+     * @return JsonResponse JSON payload containing status update confirmation and project data.
+     */
     public function changeStatus(Request $request, int $projectId): JsonResponse
     {
         $request->validate([
