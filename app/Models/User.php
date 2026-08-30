@@ -40,4 +40,9 @@ class User extends Authenticatable
     {
         return $this->role === 'editor';
     }
+
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_user')->withTimestamps();
+    }
 }
