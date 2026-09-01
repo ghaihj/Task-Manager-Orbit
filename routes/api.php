@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(AuthController::class)->group(function () {
@@ -17,7 +16,7 @@ Route::controller(AuthController::class)->group(function () {
 Route::apiResource('projects', ProjectController::class)->middleware('auth:sanctum');
 
 
-Route::put('/projects/{id}/status', [ProjectController::class, 'changeStatus']);
+Route::put('/projects/{id}/status', [ProjectController::class, 'changeStatus'])->middleware('auth:sanctum', 'role:admin,editor');
 
 
 Route::middleware('auth:sanctum')->group(function () {
