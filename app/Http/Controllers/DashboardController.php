@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Task;
+use Dedoc\Scramble\Attributes\Endpoint;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-
+#[Group('Dashboard')]
 class DashboardController extends Controller
 {
+    #[Endpoint(title: 'Get dashboard statistics', description: 'Return dashboard statistics for the current user or the full dataset based on role.')]
     public function stats(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -56,6 +59,7 @@ class DashboardController extends Controller
         return response()->json(['data' => $stats]);
     }
 
+    #[Endpoint(title: 'List users', description: 'Return the public user list for dashboard use.')]
     public function users(): JsonResponse
     {
         return response()->json(['data' => \App\Models\User::select('id', 'name', 'email', 'role')->get()]);

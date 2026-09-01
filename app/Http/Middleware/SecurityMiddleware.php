@@ -50,7 +50,26 @@ class SecurityMiddleware
         $response->headers->set('X-Download-Options', 'noopen');
 
         // 5. Enforce a strict Content Security Policy (CSP)
-        // Note: For API-driven endpoints, setting 'none' as the default fallback provides optimal security
+        // Scramble docs rely on external CDN assets, so allow those only for the docs endpoints.
+        if ($request->is('docs/*') || $request->path() === 'docs/api' || $request->path() === 'docs/api.json') {
+            $response->headers->set(
+                'Content-Security-Policy',
+                "default-src 'self' https://unpkg.com; " .
+                    "style-src 'self' 'unsafe-inline' https://unpkg.com; " .
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; " .
+                    "img-src 'self' data: https://unpkg.com; " .
+                    "connect-src 'self' https://unpkg.com; " .
+                    "font-src 'self' https://unpkg.com data:; " .
+                    "frame-ancestors 'none'; " .
+                    "form-action 'self'; " .
+                    "base-uri 'self'; " .
+                    "object-src 'none'; " .
+                    "upgrade-insecure-requests"
+            );
+
+            return $response;
+        }
+
         $response->headers->set(
             'Content-Security-Policy',
             "default-src 'none'; " .

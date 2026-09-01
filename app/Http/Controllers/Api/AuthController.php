@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Dedoc\Scramble\Attributes\Endpoint;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
+#[Group('Auth')]
 class AuthController extends Controller
 {
+    #[Endpoint(title: 'Register a new user', description: 'Create a new user account and return an auth token.')]
     public function register(Request $request)
     {
         $validate = $request->validate([
@@ -28,6 +32,7 @@ class AuthController extends Controller
         ], 201);
     }
 
+    #[Endpoint(title: 'Log in a user', description: 'Authenticate user credentials and return a personal token.')]
     public function login(Request $request)
     {
         $validate = $request->validate([
@@ -52,6 +57,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged in successfully', 'token' => $token]);
     }
 
+    #[Endpoint(title: 'Log out the authenticated user', description: 'Revoke the current user tokens and end the session.')]
     public function logout(Request $request)
     {
         try {
@@ -63,6 +69,7 @@ class AuthController extends Controller
         }
     }
 
+    #[Endpoint(title: 'Get authenticated user profile', description: 'Return the current authenticated user record.')]
     public function me(Request $request)
     {
         $user = $request->user();

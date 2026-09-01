@@ -14,7 +14,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/me', 'me')->middleware('auth:sanctum');
 });
 
-Route::apiResource('projects', ProjectController::class);
+Route::apiResource('projects', ProjectController::class)->middleware('auth:sanctum');
 
 
 Route::put('/projects/{id}/status', [ProjectController::class, 'changeStatus']);

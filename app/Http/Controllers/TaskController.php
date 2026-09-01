@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use Dedoc\Scramble\Attributes\Endpoint;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-
+#[Group('Tasks')]
 class TaskController extends Controller
 {
+    #[Endpoint(title: 'List tasks', description: 'Retrieve all visible tasks for the authenticated user.')]
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -26,6 +29,7 @@ class TaskController extends Controller
         return response()->json(['data' => $tasks]);
     }
 
+    #[Endpoint(title: 'Create a task', description: 'Create a task and optionally assign users to it.')]
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -59,6 +63,7 @@ class TaskController extends Controller
         ], 201);
     }
 
+    #[Endpoint(title: 'Get task details', description: 'Fetch a task and its related comments and users.')]
     public function show(Request $request, int $taskId): JsonResponse
     {
         $task = Task::with(['project', 'creator', 'assignedUsers', 'comments.user'])->findOrFail($taskId);
@@ -73,7 +78,8 @@ class TaskController extends Controller
         return response()->json(['data' => $task]);
     }
 
-   
+
+    #[Endpoint(title: 'Update a task', description: 'Update task fields and re-sync assigned users if provided.')]
     public function update(Request $request, int $taskId): JsonResponse
     {
         $task = Task::findOrFail($taskId);
@@ -100,6 +106,7 @@ class TaskController extends Controller
         ]);
     }
 
+    #[Endpoint(title: 'Delete a task', description: 'Delete the selected task record.')]
     public function destroy(int $taskId): JsonResponse
     {
         $task = Task::findOrFail($taskId);
@@ -108,7 +115,8 @@ class TaskController extends Controller
         return response()->json(['message' => 'Task deleted successfully']);
     }
 
- 
+
+    #[Endpoint(title: 'Update task status', description: 'Change the status of a task while enforcing assignment access rules.')]
     public function changeStatus(Request $request, int $taskId): JsonResponse
     {
         $request->validate([
@@ -130,7 +138,8 @@ class TaskController extends Controller
         ]);
     }
 
-   
+
+    #[Endpoint(title: 'Add a comment to a task', description: 'Create a new comment for an existing task.')]
     public function addComment(Request $request, int $taskId): JsonResponse
     {
         $validated = $request->validate([
@@ -150,7 +159,8 @@ class TaskController extends Controller
         ], 201);
     }
 
-  
+
+    #[Endpoint(title: 'Get task comments', description: 'List all comments associated with a task.')]
     public function comments(int $taskId): JsonResponse
     {
         $task = Task::findOrFail($taskId);
