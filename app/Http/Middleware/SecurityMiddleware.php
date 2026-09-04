@@ -58,7 +58,7 @@ class SecurityMiddleware
                     "style-src 'self' 'unsafe-inline' https://unpkg.com; " .
                     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; " .
                     "img-src 'self' data: https://unpkg.com; " .
-                    // "connect-src 'self' https://unpkg.com; " .
+                    "connect-src 'self' https://unpkg.com; " .
                     "font-src 'self' https://unpkg.com data:; " .
                     "frame-ancestors 'none'; " .
                     "form-action 'self'; " .
