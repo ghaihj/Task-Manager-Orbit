@@ -85,12 +85,6 @@ class SecurityMiddleware
                 "upgrade-insecure-requests"
         );
 
-        // 6. Restrict client-side browser features via permissions policy
-        $response->headers->set(
-            'Permissions-Policy',
-            "geolocation=(), microphone=(), camera=(), fullscreen=(self), payment=()"
-        );
-
         return $response;
     }
 }
