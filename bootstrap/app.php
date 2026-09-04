@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
-        $middleware->append(\App\Http\Middleware\SecurityMiddleware::class);
+        // $middleware->append(\App\Http\Middleware\SecurityMiddleware::class);
 
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
