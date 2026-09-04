@@ -29,6 +29,36 @@ In addition, [Laracasts](https://laracasts.com) contains thousands of video tuto
 
 You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
 
+## Wasmer deployment
+
+Set these environment variables in the Wasmer project settings before starting the app:
+
+```text
+APP_ENV=production
+APP_DEBUG=false
+APP_KEY=<output of php artisan key:generate --show>
+APP_URL=https://task-manager-orbit.wasmer.app
+DB_CONNECTION=mysql
+DB_HOST=<Wasmer database host>
+DB_PORT=<Wasmer database port>
+DB_DATABASE=<Wasmer database name>
+DB_USERNAME=<Wasmer database user>
+DB_PASSWORD=<Wasmer database password>
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
+```
+
+Run these commands once after deployment, from the project root:
+
+```bash
+php artisan migrate --force
+php artisan optimize:clear
+php artisan scramble:cache
+```
+
+The `APP_KEY` value must be generated once and kept stable. Do not commit it or database credentials to the repository.
+
 ## Agentic Development
 
 Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
