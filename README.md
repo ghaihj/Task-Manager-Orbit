@@ -59,6 +59,8 @@ php artisan scramble:cache
 
 The `APP_KEY` value must be generated once and kept stable. Do not commit it or database credentials to the repository.
 
+If the site still returns Laravel's generic 500 page, temporarily set `APP_DEBUG=true` in Wasmer and reload `/` once. The resulting exception will identify the missing setting; set `APP_DEBUG=false` again immediately afterward. The most common causes are a missing `APP_KEY`, an unavailable database, or non-writable `storage` and `bootstrap/cache` directories.
+
 ## Agentic Development
 
 Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
