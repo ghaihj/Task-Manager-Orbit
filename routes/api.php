@@ -11,6 +11,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
     Route::post('/logout', 'logout')->middleware('auth:sanctum');
     Route::post('/me', 'me')->middleware('auth:sanctum');
+    Route::get('/users', 'users')->middleware('auth:sanctum', 'role:admin');
 });
 
 Route::apiResource('projects', ProjectController::class)->middleware('auth:sanctum');
