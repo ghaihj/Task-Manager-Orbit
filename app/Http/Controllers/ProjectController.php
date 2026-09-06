@@ -25,12 +25,19 @@ class ProjectController extends Controller
      */
     public function __construct(private ProjectService $projectService) {}
 
-    // public function index(Request $request): JsonResponse
-    // {
-    //     $projects = $this->projectService->getAllProjects($request->user());
+    /**
+     * Display all projects available to the authenticated user.
+     *
+     * @param Request $request Current authenticated request.
+     * @return JsonResponse JSON payload containing the user's projects.
+     */
+    #[Endpoint(title: 'List projects', description: 'Fetch all projects available to the authenticated user.')]
+    public function index(Request $request): JsonResponse
+    {
+        $projects = $this->projectService->getAllProjects($request->user());
 
-    //     return response()->json($projects);
-    // }
+        return response()->json($projects);
+    }
 
     /**
      * Store a newly created project in storage.
