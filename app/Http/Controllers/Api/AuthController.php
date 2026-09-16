@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Dedoc\Scramble\Attributes\Endpoint;
 use Dedoc\Scramble\Attributes\Group;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\Validation\ValidationException;
 
 #[Group('Auth')]
@@ -19,7 +23,7 @@ class AuthController extends Controller
         $validate = $request->validate([
             'name' => 'required|string|max:110',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
 
         $user = User::create($validate);
@@ -28,7 +32,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User registered successfully',
-            'token' => $token
+            'token' => $token,
         ], 201);
     }
 
@@ -42,19 +46,63 @@ class AuthController extends Controller
 
         $user = User::where('email', $validate['email'])->first();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        if (!$user) {
-            return response()->json(['User Not Found!'], 404);
-        }
-
-        if (!Auth::attempt($validate)) {
+        if (!$user || !Auth::attempt($validate)) {
             throw ValidationException::withMessages([
-                'message' => 'Wrong Informations',
+                'email' => ['Wrong Informations'],
             ]);
         }
 
-        return response()->json(['message' => 'Logged in successfully', 'token' => $token]);
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Logged in successfully',
+            'token' => $token,
+        ]);
+    }
+
+    #[Endpoint(title: 'Send password reset link', description: 'Email a password reset link to the user.')]
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $status = Password::sendResetLink($request->only('email'));
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json(['message' => 'We have emailed your password reset link.']);
+        }
+
+        return response()->json(['message' => __($status)], 400);
+    }
+
+    #[Endpoint(title: 'Reset the user password', description: 'Reset a forgotten password using the email token.')]
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => ['required', 'confirmed', PasswordRule::min(8)],
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(str()->random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json(['message' => 'Password reset successfully.']);
+        }
+
+        return response()->json(['message' => __($status)], 400);
     }
 
     #[Endpoint(title: 'Log out the authenticated user', description: 'Revoke the current user tokens and end the session.')]
@@ -81,10 +129,34 @@ class AuthController extends Controller
         return response()->json(['data' => $user], 200);
     }
 
+    #[Endpoint(title: 'Update a user role', description: 'Allow only admins to change a user role.')]
+    public function updateUserRole(Request $request, User $user)
+    {
+        $request->validate([
+            'role' => 'required|string|in:admin,developer,editor',
+        ]);
+
+        $user->update([
+            'role' => $request->role,
+        ]);
+
+        return response()->json([
+            'message' => 'User role updated successfully',
+            'user' => $user->fresh(),
+        ]);
+    }
+
+    #[Endpoint(title: 'Get all users', description: 'Return all users. Accessible only by admins.')]
     public function users()
     {
-
         $users = User::all();
+
         return response()->json(['data' => $users], 200);
+    }
+
+    #[Endpoint(title: 'Get single user', description: 'Return one user by ID. Accessible only by admins.')]
+    public function user(User $user)
+    {
+        return response()->json(['data' => $user], 200);
     }
 }
