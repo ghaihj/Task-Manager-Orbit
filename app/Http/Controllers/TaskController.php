@@ -64,9 +64,9 @@ class TaskController extends Controller
     }
 
     #[Endpoint(title: 'Get task details', description: 'Fetch a task and its related comments and users.')]
-    public function show(Request $request, int $taskId): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
-        $task = Task::with(['project', 'creator', 'assignedUsers', 'comments.user'])->findOrFail($taskId);
+        $task = Task::with(['project', 'creator', 'assignedUsers', 'comments.user'])->findOrFail($id);
 
         $user = $request->user();
 
@@ -80,9 +80,9 @@ class TaskController extends Controller
 
 
     #[Endpoint(title: 'Update a task', description: 'Update task fields and re-sync assigned users if provided.')]
-    public function update(Request $request, int $taskId): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
-        $task = Task::findOrFail($taskId);
+        $task = Task::findOrFail($id);
 
         $validated = $request->validate([
             'title'          => ['nullable', 'string', 'max:255'],
@@ -107,9 +107,9 @@ class TaskController extends Controller
     }
 
     #[Endpoint(title: 'Delete a task', description: 'Delete the selected task record.')]
-    public function destroy(int $taskId): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $task = Task::findOrFail($taskId);
+        $task = Task::findOrFail($id);
         $task->delete();
 
         return response()->json(['message' => 'Task deleted successfully']);
@@ -117,13 +117,13 @@ class TaskController extends Controller
 
 
     #[Endpoint(title: 'Update task status', description: 'Change the status of a task while enforcing assignment access rules.')]
-    public function changeStatus(Request $request, int $taskId): JsonResponse
+    public function changeStatus(Request $request, int $id): JsonResponse
     {
         $request->validate([
             'status' => ['required', 'in:todo,in_progress,review,done'],
         ]);
 
-        $task = Task::findOrFail($taskId);
+        $task = Task::findOrFail($id);
         $user = $request->user();
 
         if ($user->role === 'developer' && !$task->assignedUsers->contains($user->id)) {
@@ -140,13 +140,13 @@ class TaskController extends Controller
 
 
     #[Endpoint(title: 'Add a comment to a task', description: 'Create a new comment for an existing task.')]
-    public function addComment(Request $request, int $taskId): JsonResponse
+    public function addComment(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
             'content' => ['required', 'string'],
         ]);
 
-        $task = Task::findOrFail($taskId);
+        $task = Task::findOrFail($id);
 
         $comment = $task->comments()->create([
             'user_id' => $request->user()->id,
@@ -161,9 +161,9 @@ class TaskController extends Controller
 
 
     #[Endpoint(title: 'Get task comments', description: 'List all comments associated with a task.')]
-    public function comments(int $taskId): JsonResponse
+    public function comments(int $id): JsonResponse
     {
-        $task = Task::findOrFail($taskId);
+        $task = Task::findOrFail($id);
 
         return response()->json(['data' => $task->comments()->with('user')->latest()->get()]);
     }

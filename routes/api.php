@@ -13,15 +13,15 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/reset-password', 'resetPassword');
     Route::post('/logout', 'logout')->middleware('auth:sanctum');
     Route::post('/me', 'me')->middleware('auth:sanctum');
-    Route::get('/users', 'users')->middleware('auth:sanctum', 'role:admin');
-    Route::get('/users/{user}', 'user')->middleware('auth:sanctum', 'role:admin');
-    Route::put('/users/{user}/role', 'updateUserRole')->middleware('auth:sanctum', 'role:admin');
+    Route::get('/users', 'users')->middleware(['auth:sanctum', 'role:admin']);
+    Route::get('/users/{user}', 'user')->middleware(['auth:sanctum', 'role:admin']);
+    Route::put('/users/{user}/role', 'updateUserRole')->middleware(['auth:sanctum', 'role:admin']);
 });
 
 Route::apiResource('projects', ProjectController::class)->middleware('auth:sanctum');
 
 
-Route::put('/projects/{id}/status', [ProjectController::class, 'changeStatus'])->middleware('auth:sanctum', 'role:admin,editor');
+Route::put('/projects/{id}/status', [ProjectController::class, 'changeStatus'])->middleware(['auth:sanctum', 'role:admin,editor']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -46,5 +46,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
-    Route::get('/users', [DashboardController::class, 'users']);
+    Route::get('/dashboard/users', [DashboardController::class, 'users']);
 });
