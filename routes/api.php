@@ -15,7 +15,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/me', 'me')->middleware('auth:sanctum');
     Route::get('/users', 'users')->middleware(['auth:sanctum', 'role:admin']);
     Route::get('/users/{user}', 'user')->middleware(['auth:sanctum', 'role:admin']);
-    Route::put('/users/{user}/role', 'updateUserRole')->middleware(['auth:sanctum', 'role:admin']);
+    Route::put('/users/{user}/role', 'updateUserRole')->middleware('auth:sanctum');
+    Route::patch('/users/{user}/profile', 'updateProfile');
+    Route::delete('/users/{user}', 'deleteUser');
 });
 
 Route::apiResource('projects', ProjectController::class)->middleware('auth:sanctum');

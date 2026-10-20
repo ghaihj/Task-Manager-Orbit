@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\Validation\ValidationException;
 
@@ -158,5 +159,41 @@ class AuthController extends Controller
     public function user(User $user)
     {
         return response()->json(['data' => $user], 200);
+    }
+
+    #[Endpoint(title: 'Update the authenticated user profile', description: 'Update the current user name, email, or password.')]
+    public function updateProfile(Request $request, User $user)
+    {
+        $user = User::where('id', $user->id)->first();
+
+        $validate = $request->validate([
+            'name' => 'sometimes|required|string|max:110',
+            'email' => ['sometimes', 'required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['sometimes', 'required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        if (!$user) {
+            return response()->json(['message' => 'User Not Found!'], 404);
+        }
+
+        $user->update($validate);
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'data' => $user->fresh(),
+        ]);
+    }
+
+    public function deleteUser(User $user)
+    {
+        $user = User::where('id', $user->id)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User Not Found!'], 404);
+        }
+
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully'], 200);
     }
 }
