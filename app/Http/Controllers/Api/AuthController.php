@@ -184,6 +184,7 @@ class AuthController extends Controller
         ]);
     }
 
+    #[Endpoint(title: 'Delete a user', description: 'Allow only admins to delete a user.')]
     public function deleteUser(User $user)
     {
         $user = User::where('id', $user->id)->first();
