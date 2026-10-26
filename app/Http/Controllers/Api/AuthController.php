@@ -147,6 +147,23 @@ class AuthController extends Controller
         ]);
     }
 
+    #[Endpoint(title: 'Update a user status', description: 'Allow only admins to change a user status.')]
+    public function updateUserStatus(Request $request, User $user)
+    {
+        $request->validate([
+            'status' => 'required|string|in:active,pending',
+        ]);
+
+        $user->update([
+            'status' => $request->status,
+        ]);
+
+        return response()->json([
+            'message' => 'User status updated successfully',
+            'user' => $user->fresh(),
+        ]);
+    }
+
     #[Endpoint(title: 'Get all users', description: 'Return all users. Accessible only by admins.')]
     public function users()
     {

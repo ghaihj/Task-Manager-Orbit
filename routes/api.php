@@ -16,6 +16,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/users', 'users')->middleware(['auth:sanctum', 'role:admin']);
     Route::get('/users/{user}', 'user')->middleware(['auth:sanctum', 'role:admin']);
     Route::put('/users/{user}/role', 'updateUserRole')->middleware('auth:sanctum');
+    Route::put('/users/{user}/status', 'updateUserStatus')->middleware('auth:sanctum');
     Route::patch('/users/{user}/profile', 'updateProfile');
     Route::delete('/users/{user}', 'deleteUser');
 });
